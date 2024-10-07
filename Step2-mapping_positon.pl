@@ -11,7 +11,7 @@ GetOptions(
 	'o:s' => \$out_vcf,
 ) or die $!;
 
-open IN,"<:gzip","$in_vcf" || die $!;
+open IN,"zcat $in_vcf |" || die $!;
 open OUT,">:gzip","$out_vcf" || die $!;
 while (<IN>) {
 	if (/^#/) {
@@ -19,7 +19,7 @@ while (<IN>) {
 	}else{
 		my @vcf = split/\s+/,$_,3;
 		my @name = split/:/,$vcf[0];
-		print OUT join("\t",($name[0],$name[1]+$vcf[1],$vcf[2]));
+		print OUT join("\t",($name[0],($name[1]=~/^(\d+)/)[0]+$vcf[1],$vcf[2]));
 	}
 }
 close OUT;
